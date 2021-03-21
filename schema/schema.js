@@ -1,12 +1,20 @@
 const graphql = require('graphql');
 
-const { GraphQLInputObjectType, GraphQLString } = graphql;
+const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID } = graphql;
 
-const MovieType = new GraphQLInputObjectType({
+const movies = [
+    { id: '1', name: 'Total Power', genre: 'thriller'},
+    { id: '2', name: 'Garry Potter', genre: 'fantasy'},
+    { id: '3', name: 'Lord of the rings', genre: 'fantasy'},
+    { id: '4', name: 'Dark waters', genre: 'detective'},
+    { id: '5', name: 'Travel to a desert island', genre: 'Adventures'},
+]
+
+const MovieType = new GraphQLObjectType({
     name: 'Movie',
     fields: () => ({
         id: { 
-            type: GraphQLString 
+            type: GraphQLID 
         },
         name: { 
             type: GraphQLString 
@@ -16,3 +24,20 @@ const MovieType = new GraphQLInputObjectType({
         },
     }),
 })
+
+const Query = new GraphQLObjectType({
+  name: 'Query',
+  fields: {
+    movie: {
+      type: MovieType,
+      args: { id: { type: GraphQLID } },
+      resolve(parent, args) {
+        return movies.find(movie => movie.id == args.id);
+      },
+    },
+  }
+});
+
+module.exports = new GraphQLSchema({
+    query: Query,
+  });
